@@ -100,6 +100,16 @@ $(document).ready(function() {
       _.filter(dogs, 'age', 5),
       _.filter(dogs, function (dog) { return dog.age == 5; }),
       'can filter by passing a key and value to match');
+      
+    same(
+      _.filter(dogs, 'name', /l/),
+      _.filter(dogs, function (dog) { return /l/.test(dog.name) }),
+      'passing a regex as a value calls regex.test()');
+      
+    same(
+      _.filter(dogs, {name: /e/, age: 5}),
+      _.filter(dogs, function (dog) { return /e/.test(dog.name) && dog.age === 5}),
+      'can pass a regex in an object');
   });
 
   test('collections: reject', function() {
