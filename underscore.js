@@ -127,7 +127,31 @@
 
   // Return all the elements that pass a truth test. 
   // Delegates to JavaScript 1.6's native filter if available.
+  //
+  // TODO: 
+  //  abstract out iterator building code
+  //  I think passing a regex as a value should run its test() method, testing
+  //  a string is so common, which testing a regex equality so rare.
   _.filter = function(obj, iterator, context) {
+    if (!_.isFunction(iterator)) {
+      if (typeof iterator === 'object') {  
+        // given props to check, e.g. {age: 5, name: 'h' }
+        // TODO: speed up if only one prop
+        var expected = iterator, iterator = function (item) { 
+          return _.every(expected, function (value, key) {
+            return value === item[key];
+          });
+        };
+      }
+      else {  
+        // given a key, value pair to check
+        // can totally ignore context arg as it makes no sense if we are building iterator fn.
+        var key = iterator, value = context;
+        iterator = function (item) {  
+          return item[key] === value;
+        }
+      }
+    }
     if (obj.filter === Native.filter) return obj.filter(iterator, context);
     var results = [];
     each(obj, function(value, index, list) {
