@@ -61,7 +61,7 @@
 
   // The cornerstone, an each implementation.
   // Handles objects implementing forEach, arrays, and raw objects.
-  // Delegates to JavaScript 1.6's native forEach if available.
+  // Delegates to JavaScript 1.6's native forEach if available.  
   var each = _.forEach = function(obj, iterator, context) {
     var index = 0;
     try {
@@ -79,10 +79,21 @@
     }
     return obj;
   };
-
-  // Return the results of applying the iterator to each element.
-  // Delegates to JavaScript 1.6's native map if available.
+  
   _.map = function(obj, iterator, context) {
+    // Produces a new array of values by mapping each value in list
+    // through a transformation function (iterator). If the native
+    // map method exists, it will be used instead.
+    //
+    // == Props ==
+    // name: 'map'
+    // signature: '_.map(obj, iterator, [context])'
+    // isNative: true
+    //
+    // == Examples ==
+    //  _.map([1, 2, 3], function(num){ return num * 3 });
+    //  => [3, 6, 9]
+    //
     if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
     var results = [];
     each(obj, function(value, index, list) {
@@ -91,9 +102,22 @@
     return results;
   };
 
-  // Reduce builds up a single result from a list of values, aka inject, or foldl.
-  // Delegates to JavaScript 1.8's native reduce if available.
+
   _.reduce = function(obj, memo, iterator, context) {
+    // Also known as inject and foldl, reduce boils down a list of values
+    // into a single value. Memo is the initial state of the reduction, and
+    // each successive step of it should be returned by iterator.
+    //
+    // == Props ==
+    // name: 'reduce'
+    // signature: '_.reduce(obj, memo, iterator, [context])'
+    // isNative: true
+    // alias: ['foldl', 'inject']
+    //
+    // == Examples ==
+    //  var sum = _.reduce([1, 2, 3], 0, function(memo, num){ return memo + num })
+    //  => 6
+    //
     if (nativeReduce && obj.reduce === nativeReduce) return obj.reduce(_.bind(iterator, context), memo);
     each(obj, function(value, index, list) {
       memo = iterator.call(context, memo, value, index, list);
@@ -101,9 +125,21 @@
     return memo;
   };
 
-  // The right-associative version of reduce, also known as foldr. Uses
-  // Delegates to JavaScript 1.8's native reduceRight if available.
+
   _.reduceRight = function(obj, memo, iterator, context) {
+    // The right-associative version of <a href='#reduce'>reduce</a>. 
+    // Not as useful as it would be in a language with lazy evaluation.
+    //
+    // == Props ==
+    // name: 'reduceRight'
+    // isNative: true
+    // signature: '_.reduceRight(obj, memo, iterator, [context])'
+    //
+    // == Examples ==
+    //  var list = [[0, 1], [2, 3], [4, 5]];
+    //  var flat = _.reduceRight(list, [], function(a, b) { return a.concat(b); });
+    //  => [4, 5, 2, 3, 0, 1]
+    
     if (nativeReduceRight && obj.reduceRight === nativeReduceRight) return obj.reduceRight(_.bind(iterator, context), memo);
     var reversed = _.clone(_.toArray(obj)).reverse();
     return _.reduce(reversed, memo, iterator, context);

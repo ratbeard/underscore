@@ -65,6 +65,102 @@
         margin: 0px 0 30px;
       }
   </style>
+  <!-- Include Underscore, so you can play with it in the console. -->
+  <script type="text/javascript" src="underscore.js"></script>
+  <script>
+  
+  // process inline documentation in a function.
+  // docs need to be inside function body so we can see them with fn.toString()
+  // implementation is very basic in some areas (need to specify method signature),
+  // and perhaps too tricky in others (highlighting words in desc automatically)
+  InlineDocs = function (fn) {
+    return  InlineDocs.output(
+              InlineDocs.interpret(
+                InlineDocs.partition(fn)));
+  }
+  
+  // Partition the inline comments that begin the body of a function by
+  // what section they are in.  A section start looks like this:
+  // == Props ==
+  // The first section is assumed to be the description (Desc)
+  // Also, grab the first line to get the function declaration
+  // returns a map of { sections => [lines] }
+  InlineDocs.partition = function (fn) {
+    var current_section,
+        lines = fn.toString().split('\n'),
+        result = {}; 
+
+    result.first = lines.shift();
+    in_section('Desc');
+    
+    _.each(lines, function (line, i) {
+      var match = line.match(/^\s*\/\/\s*(.*)$/); // capture everything after leading comment marker
+      if (!match)  _.breakLoop();
+      var text = match[1];
+      if (match = text.match(/^==\s*(.*?)\s*==\s*$/)) // capture section name
+        in_section(match[1]);
+      else
+        add_to_current_section(text);
+    });
+    return result;
+    //~
+    function in_section(section) {
+      // remove trailing empty lines before moving on
+      var lines = result[current_section];
+      while (lines && _.last(lines).match(/^\s*$/))  lines.pop();
+      result[current_section = section] = [];
+    }
+    function add_to_current_section(line) {
+      result[current_section].push(line);
+    }
+  }
+  
+  // Enhance our map of section -> [lines]
+  // eval Props section as json
+  // highlight desc for parameter and method names
+  // a 'presenter' object of sorts
+  InlineDocs.interpret = function (lines) {
+    var result, props = '({'+lines.Props.join()+ '})';
+    try {  result = eval(props);  } 
+    catch (e) {  alert('Props not formatted as json');  }
+    
+    // highlight parameter names and method name
+    var parameters = lines.first.match(/\((.*?)\)/)[1].split(/,\s/),
+        special = parameters.concat(result.name);  
+    result.desc = highlight(lines.Desc.join(' '), special);
+    //
+    result.examples = lines.Examples;
+    result.alias_str = (result.alias || []).join(', ');
+    return result;
+    //~
+    function highlight(str, words) {
+      return str.replace(RegExp('\\b('+words.join('|')+')\\b', 'gi'), '<b>$1</b>');
+    }
+  };
+  
+  // turn our data in to html
+  InlineDocs.template = _.template([
+    '<p id=<%= name %>>',
+      '<b class="header"><%= name %></b>', 
+      '<code><%= signature %></code>',
+      '<% if (alias_str) { %>',
+          '<span class="alias">Alias: <b><%= alias_str %></b></span>',
+      '<% } %>',
+      '<br>',
+      '<%= desc %>',
+      '<% if (isNative) { %>',
+          ' Delegates to the native <b><%= name %></b> implementation if available.',
+      '<% } %>',
+      '<pre>',
+        '<%= examples.join("\\n") %>',
+      '</pre>'
+  ].join(''));
+  
+  InlineDocs.output = function (data) {
+    return InlineDocs.template(data);
+  };
+  
+  </script>
 </head>
 <body>
 
@@ -250,45 +346,11 @@ _(lyrics).chain()
 _.each([1, 2, 3], function(num){ alert(num); });
 =&gt; alerts each number in turn...</pre>
 
-      <p id="map">
-        <b class="header">map</b><code>_.map(list, iterator, [context])</code>
-        <br />
-        Produces a new array of values by mapping each value in <b>list</b>
-        through a transformation function (<b>iterator</b>). If the native
-        <b>map</b> method exists, it will be used instead.
-      </p>
-      <pre>
-_.map([1, 2, 3], function(num){ return num * 3 });
-=&gt; [3, 6, 9]</pre>
-
-      <p id="reduce">
-        <b class="header">reduce</b><code>_.reduce(list, memo, iterator, [context])</code>
-        <span class="alias">Aliases: <b>inject, foldl</b></span>
-        <br />
-        Also known as <b>inject</b> and <b>foldl</b>, <b>reduce</b> boils down a
-        <b>list</b> of values into a single value. <b>Memo</b> is the initial state
-        of the reduction, and each successive step of it should be returned by
-        <b>iterator</b>.
-      </p>
-      <pre>
-var sum = _.reduce([1, 2, 3], 0, function(memo, num){ return memo + num });
-=&gt; 6
-</pre>
-
-      <p id="reduceRight">
-        <b class="header">reduceRight</b><code>_.reduceRight(list, memo, iterator, [context])</code>
-        <span class="alias">Alias: <b>foldr</b></span>
-        <br />
-        The right-associative version of <b>reduce</b>. Delegates to the
-        JavaScript 1.8 version of <b>reduceRight</b>, if it exists. <b>Foldr</b>
-        is not as useful in JavaScript as it would be in a language with lazy
-        evaluation.
-      </p>
-      <pre>
-var list = [[0, 1], [2, 3], [4, 5]];
-var flat = _.reduceRight(list, [], function(a, b) { return a.concat(b); });
-=&gt; [4, 5, 2, 3, 0, 1]
-</pre>
+        <script>
+            document.write(InlineDocs(_.map))
+            document.write(InlineDocs(_.reduce))
+            document.write(InlineDocs(_.reduceRight))
+        </script>
 
       <p id="detect">
         <b class="header">detect</b><code>_.detect(list, iterator, [context])</code>
@@ -1325,9 +1387,5 @@ _([1, 2, 3]).value();
     </div>
 
   </div>
-
-  <!-- Include Underscore, so you can play with it in the console. -->
-  <script type="text/javascript" src="underscore.js"></script>
-
 </body>
 </html>
