@@ -160,6 +160,35 @@
     return InlineDocs.template(data);
   };
   
+  
+  function Functionz (fn) {
+      this.lines = Functionz.split_lines(fn);
+
+      this.text  = _.reduce(this.lines, {}, function (memo, lines, name) { 
+          console.log(lines, name);
+          memo[name] = lines.join('\n');
+          console.log(memo[name]);
+          return memo;
+      });
+      
+  }
+  
+  Functionz.split_lines = function (fn) {
+      var match, 
+          lines = fn.toString().split('\n'),
+          result = {decl: [lines.shift()], docs: [] };
+var i = 0;
+      // capture everything after leading comment marker
+      while (i<1050 &&(match = _.first(lines).match(/^\s*\/\/\s*(.*)$/))) {
+          i++
+        result.docs.push(match);  lines.shift()
+      }
+      result.impl = lines;
+      return result;
+  }
+  
+  
+  
   </script>
 </head>
 <body>

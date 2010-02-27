@@ -101,6 +101,20 @@
     });
     return results;
   };
+  
+  
+  _.map2 = function(obj, iterator, context) {
+    // Produces a new array of values by mapping each value in list through 
+    // a transformation function (iterator).
+    //    _.map([1, 2, 3], function(num){ return num * 3 }); => [3, 6, 9]
+    if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+    var results = [];
+    each(obj, function(value, index, list) {
+      results.push(iterator.call(context, value, index, list));
+    });
+    return results;
+  };
+  
 
 
   _.reduce = function(obj, memo, iterator, context) {
