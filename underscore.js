@@ -427,8 +427,11 @@
     return _.map(obj, _.identity);
   };
 
+
   // Return a sorted list of the function names available on the object.
+  // By default obj is underscore
   _.functions = function(obj) {
+    if (!arguments.length) obj = _;
     return _.filter(_.keys(obj), function(key){ return _.isFunction(obj[key]); }).sort();
   };
 

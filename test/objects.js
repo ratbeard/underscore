@@ -23,6 +23,7 @@ $(document).ready(function() {
     
     var obj = {a : 'dash', b : _.map, c : /yo/, d : _.reduce};
     same(_.functions(obj), ['b', 'd'], 'can grab the function names of any passed-in object');
+    same(_.methods(), _.methods(_), 'called on _ by default');
   });
 
   test("objects: extend", function() {

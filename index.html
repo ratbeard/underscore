@@ -741,10 +741,14 @@ _.values({one : 1, two : 2, three : 3});
         <br />
         Returns a sorted list of the names of every method in an object &mdash;
         that is to say, the name of every function property of the object.
+        Returns the methods on underscore if not given an object
       </p>
       <pre>
-_.functions(_);
+_.functions();
 =&gt; ["all", "any", "bind", "bindAll", "clone", "compact", "compose" ...
+_.functions(jQuery);
+=&gt; ["Event", "ajax", "ajaxSetup", "attr", "clean", "css" ...
+
 </pre>
 
       <p id="extend">
