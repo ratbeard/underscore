@@ -154,11 +154,16 @@ $(document).ready(function() {
   });
 
   test('collections: toArray', function() {
-    ok(!_.isArray(arguments), 'arguments object is not an array');
-    ok(_.isArray(_.toArray(arguments)), 'arguments object converted into array');
+    ok(_.isArray(_.toArray(arguments)), 'converts arguments object to a real array');
+    same(_.toArray({a: 1, b: 2, c: 3}), [1,2,3], 'converts object to array of its values');
 
-    var numbers = _.toArray({one : 1, two : 2, three : 3});
-    equals(numbers.join(', '), '1, 2, 3', 'object flattened into array');
+    // Do we want to wrap the primitives in an array instead?
+    same(_.toArray(null), [],   'converts null to an empty array');
+    same(_.toArray(), [],       'converts undefined to an empty array');
+    same(_.toArray(4), [],      'converts a number to an empty array');
+    same(_.toArray(true), [],   'converts true to an empty array');
+    same(_.toArray(false), [],  'converts false to an empty array');
+    same(_.toArray('hi'), ['h','i'], 'converts strings to an array of letters');
   });
 
   test('collections: size', function() {

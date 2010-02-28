@@ -32,9 +32,9 @@ $(document).ready(function() {
     equals(_.extend({a:'x'}, {a:'b'}).a, 'b', 'properties in source override destination');
     equals(_.extend({x:'x'}, {a:'b'}).x, 'x', 'properties not in source dont get overriden');
     result = _.extend({x:'x'}, {a:'a'}, {b:'b'});
-    ok(_.isEqual(result, {x:'x', a:'a', b:'b'}), 'can extend from multiple source objects');
+    same(result, {x:'x', a:'a', b:'b'}, 'can extend from multiple source objects');
     result = _.extend({x:'x'}, {a:'a', x:2}, {a:'b'});
-    ok(_.isEqual(result, {x:2, a:'b'}), 'extending from multiple source objects last property trumps');
+    same(result, {x:2, a:'b'}, 'extending from multiple source objects last property trumps');
   });
 
   test("objects: clone", function() {
