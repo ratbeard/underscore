@@ -3,11 +3,11 @@ $(document).ready(function() {
   module("Object functions (values, extend, isEqual, and so on...)");
 
   test("objects: keys", function() {
-    equals(_.keys({one : 1, two : 2}).join(', '), 'one, two', 'can extract the keys from an object');
+    same(_.keys({one : 1, two : 2}), ['one', 'two'], 'can extract the keys from an object');
   });
 
   test("objects: values", function() {
-    equals(_.values({one : 1, two : 2}).join(', '), '1, 2', 'can extract the values from an object');
+    same(_.values({one : 1, two : 2}), [1, 2], 'can extract the values from an object');
   });
 
   test("objects: functions", function() {
@@ -20,8 +20,9 @@ $(document).ready(function() {
     "size", "some", "sortBy", "sortedIndex", "tail", "tap", "template", "times", "toArray", "uniq",
     "uniqueId", "values", "without", "wrap", "zip"];
     same(expected, _.methods(_), 'provides a sorted list of functions');
-    var obj = {a : 'dash', b : _.map, c : (/yo/), d : _.reduce};
-    ok(_.isEqual(['b', 'd'], _.functions(obj)), 'can grab the function names of any passed-in object');
+    
+    var obj = {a : 'dash', b : _.map, c : /yo/, d : _.reduce};
+    same(_.functions(obj), ['b', 'd'], 'can grab the function names of any passed-in object');
   });
 
   test("objects: extend", function() {
@@ -110,6 +111,9 @@ $(document).ready(function() {
     ok(!_.isArray(arguments), 'the arguments object is not an array');
     ok(_.isArray([1, 2, 3]), 'but arrays are');
     ok(_.isArray(iArray), 'even from another frame');
+    ok(_.isArray([]), 'empty arrays are arrays');
+    ok(!_.isArray({length: 5}), 'objects with length property are not arrays');
+    ok(!_.isArray(_), 'underscore is not an array')
   });
 
   test("objects: isString", function() {
@@ -159,6 +163,7 @@ $(document).ready(function() {
   test("objects: isNull", function() {
     ok(!_.isNull(undefined), 'undefined is not null');
     ok(!_.isNull(NaN), 'NaN is not null');
+    ok(!_.isNull(false), 'false is not null');
     ok(_.isNull(null), 'but null is');
     ok(_.isNull(iNull), 'even from another frame');
   });
