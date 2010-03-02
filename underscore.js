@@ -437,9 +437,8 @@
 
   // Extend a given object with all the properties in given object(s)
   _.extend = function(obj) {
-    var prop;
     each(_.rest(arguments), function (source) {
-      for (prop in source) obj[prop] = source[prop];  
+      for (var prop in source) obj[prop] = source[prop];  
     });
     return obj;
   };
